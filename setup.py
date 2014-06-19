@@ -6,5 +6,11 @@ setup(name='prototapes',
       author='Some dudes',
       package_dir={'':'src'},
       packages=find_packages('src'),
+      install_requires=[
+          'sqlalchemy',
+          'flask',
+          'flask-sqlalchemy',
+          'flask-restful'
+      ],
       test_suite='tests'
      )

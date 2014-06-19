@@ -1,15 +1,18 @@
 from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
+
+from database import db
 
 app = Flask(__name__)
+app.debug = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./database/prototapes.db'
-db = SQLAlchemy(app)
+db.init_app(app)
+with app.app_context():
+    db.create_all()
 
 
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
-
+def hello():
+    return "Hello world"
 
 if __name__ == '__main__':
     app.run()
