@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='prototapes',
-      version='0.001',
+      version='0.002',
       description='music sharing website',
       author='Some dudes',
       package_dir={'':'src'},
