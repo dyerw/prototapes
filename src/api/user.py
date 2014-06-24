@@ -1,3 +1,6 @@
+import hashlib
+
+from flask import session
 from flask.ext.restful import Resource, reqparse, abort
 
 from database import db, User
@@ -7,7 +10,15 @@ class UserApi(Resource):
     def user_exists(self, user):
         return len(User.query.filter_by(username=user).all()) > 0
 
+    def valid_password(self, username, password):
+        user = User.query.filter_by(username=username).first()
+        return user.password == hashlib.sha1(password + user.salt).hexdigest()
+
     def post(self):
+        """
+        Registers a new user if valid username, password, and email
+        are given.
+        """
         parser = reqparse.RequestParser()
         parser.add_argument('username', type=str, required=True)
         parser.add_argument('password', type=str, required=True)
@@ -29,9 +40,18 @@ class UserApi(Resource):
         db.session.commit()
 
     def get(self):
+        """
+        Logs a user in if username and password supplied are valid.
+        """
         parser = reqparse.RequestParser()
         parser.add_argument('username', type=str, required=True)
+        parser.add_argument('password', type=str, required=True)
         args = parser.parse_args()
 
         if not self.user_exists(args['username']):
             abort(404, message='User does not exist')
+
+        if not self.valid_password(args['username'], args['password']):
+            abort(401, message='Invalid password')
+
+        session['username'] = args['username']

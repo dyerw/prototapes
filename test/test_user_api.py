@@ -2,7 +2,7 @@ import unittest
 import json
 
 from prototapes import app
-from database import db, Request
+from database import db
 
 
 class TestUserPost(unittest.TestCase):
@@ -49,8 +49,15 @@ class TestUserPost(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(message, 'Username is an incorrect length')
 
+    def tearDown(self):
+        with app.app_context():
+            db.drop_all()
+
 
 class TestUserGet(unittest.TestCase):
+    """
+    Test functionality to do with logging in.
+    """
     def setUp(self):
         # Change the database to a test one in memory and
         # create all our tables there
@@ -61,21 +68,39 @@ class TestUserGet(unittest.TestCase):
 
     def test_user_does_not_exist(self):
         # Fails because user does not exist
-        response = self.app.get("/user?username=test_user")
+        response = self.app.get("/user?username=test_user&password=abc123")
         self.assertEqual(response.status_code, 404)
         message = json.loads(response.data)['message']
         self.assertEqual(message, 'User does not exist')
 
     def test_username_not_given(self):
         # Fails because username is not provided
-        response = self.app.get("/user")
+        response = self.app.get("/user?password=abc123")
         self.assertEqual(response.status_code, 400)
 
-    def test_success(self):
+    def test_password_not_given(self):
+        # Fails because username is not provided
+        response = self.app.get("/user?username=test_user")
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_password(self):
         # Add a user
         self.app.post("/user", data=dict(username='test_user',
                       password='abc123', email='asd@asd.com'))
 
-        # Succeeds because user exists
-        response = self.app.get('/user?username=test_user')
+        response = self.app.get('/user?username=test_user&password=wowowww')
+        self.assertEqual(response.status_code, 401)
+        message = json.loads(response.data)['message']
+        self.assertEqual(message, 'Invalid password')
+
+    def test_successful_login(self):
+        # Add a user
+        self.app.post("/user", data=dict(username='test_user',
+                      password='abc123', email='asd@asd.com'))
+
+        response = self.app.get('/user?username=test_user&password=abc123')
         self.assertEqual(response.status_code, 200)
+
+    def tearDown(self):
+        with app.app_context():
+            db.drop_all()

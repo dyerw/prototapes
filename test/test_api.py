@@ -92,9 +92,6 @@ class ApiTests(unittest.TestCase):
 
         # Fails because a request has already been made
 
-    def test_friends_get(self):
-        pass
-
     def tearDown(self):
         with app.app_context():
             db.drop_all()
