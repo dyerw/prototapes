@@ -1,13 +1,13 @@
 from flask import session
 from flask.ext.restful import Resource, abort
 
-from database import db, Friends, is_signed_in
+from api import abort_if_not_signed_in
+from database import Friends
 
 
 class FriendsApi(Resource):
     def get(self):
-        if not is_signed_in():
-            abort(500, message="Not signed in")
+        abort_if_not_signed_in()
 
         friends = Friends.query.filter_by(friend1=session['username']).all()
         return friends

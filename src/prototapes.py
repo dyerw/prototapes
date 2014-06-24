@@ -1,13 +1,15 @@
-from flask import Flask
+from flask import Flask, session
 from flask.ext.restful import Api
 
 from database import db
 from api.user import UserApi
+from api.request import RequestApi
+from api.friends import FriendsApi
 
 app = Flask(__name__)
 
-
 app.debug = True
+app.secret_key = "PolarBearSunset"
 
 # Initialize Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./database/prototapes.db'
@@ -18,12 +20,19 @@ with app.app_context():
 # Initialize API
 api = Api(app)
 api.add_resource(UserApi, '/user')
+api.add_resource(FriendsApi, '/friends')
+api.add_resource(RequestApi, '/request')
 
 
 
 @app.route('/')
 def hello():
     return "Hello world"
+
+@app.route('/session')
+def get_session():
+    session['got_session'] = 'yep'
+    return str(session)
 
 if __name__ == '__main__':
     app.run()
