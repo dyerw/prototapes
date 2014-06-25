@@ -26,6 +26,10 @@ class TestUserPost(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_user_already_exists(self):
+        # Create a user
+        self.app.post("/user", data=dict(username='test_user',
+                                 password='abc123', email='asd@asd.com'))
+
         # Fails because user already exists
         response = self.app.post("/user", data=dict(username='test_user',
                                  password='abc123', email='asd@asd.com'))

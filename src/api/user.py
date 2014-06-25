@@ -4,12 +4,10 @@ from flask import session
 from flask.ext.restful import Resource, reqparse, abort
 
 from database import db, User
+from api import user_exists
 
 
 class UserApi(Resource):
-    def user_exists(self, user):
-        return len(User.query.filter_by(username=user).all()) > 0
-
     def valid_password(self, username, password):
         user = User.query.filter_by(username=username).first()
         return user.password == hashlib.sha1(password + user.salt).hexdigest()
@@ -26,7 +24,7 @@ class UserApi(Resource):
         args = parser.parse_args()
 
         # Validation checks on user input
-        if self.user_exists(args['username']):
+        if user_exists(args['username']):
             abort(400, message='User already exists')
 
         if len(args['password']) < 6 or len(args['password']) > 150:
@@ -48,7 +46,7 @@ class UserApi(Resource):
         parser.add_argument('password', type=str, required=True)
         args = parser.parse_args()
 
-        if not self.user_exists(args['username']):
+        if not user_exists(args['username']):
             abort(404, message='User does not exist')
 
         if not self.valid_password(args['username'], args['password']):

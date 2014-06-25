@@ -24,15 +24,15 @@ api.add_resource(FriendsApi, '/friends')
 api.add_resource(RequestApi, '/request')
 
 
-
 @app.route('/')
 def hello():
     return "Hello world"
 
-@app.route('/session')
-def get_session():
-    session['got_session'] = 'yep'
-    return str(session)
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return "Logged out"
 
 if __name__ == '__main__':
     app.run()
