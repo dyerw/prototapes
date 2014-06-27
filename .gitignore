@@ -1,3 +1,4 @@
 .idea/*
 *.pyc
 *.egg-info/
+test/test_uploads/*

@@ -4,3 +4,4 @@ db = SQLAlchemy()
 from request import Request
 from user import User
 from friends import Friends
+from song import Song
